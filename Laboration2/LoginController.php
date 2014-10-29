@@ -20,7 +20,6 @@ class LoginController {
 
     // Funktion för att avgöra vilken vy som ska visas för användaren
     public function doLogin() {
-        var_dump($_COOKIE);
         $action = $this->loginView->getAction(); // Hämtar värdet från querystringen
         $this->loginModel->calculateSessionUniqueKey($this->loginView->getClientBrowser()); // Beräkna ett unik nyckel för den aktuella sessionen, värdet sätts i loginModel-objektet
 
