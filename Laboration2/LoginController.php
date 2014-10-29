@@ -18,61 +18,63 @@ class LoginController {
         $this->loginView = new LoginView($this->loginModel);
     }
 
+    // Funktion för att avgöra vilken vy som ska visas för användaren
     public function doLogin() {
-        $action = $this->loginView->getAction();
-        //$this->loginView->updateSessionInfo();
-        //var_dump($_SESSION);
+        var_dump($_COOKIE);
+        $action = $this->loginView->getAction(); // Hämtar värdet från querystringen
+        $this->loginModel->calculateSessionUniqueKey($this->loginView->getClientBrowser()); // Beräkna ett unik nyckel för den aktuella sessionen, värdet sätts i loginModel-objektet
 
-        if(($this->loginView->getSessionUser() !== null) && ($action !== "logout") ) {
-            $isUserValid = $this->loginModel->authenticateUser($this->loginView->getSessionUser(), $this->loginView->getSessionPassword());
-            if($isUserValid == true) {
-                $this->loginModel->setLoginMessage(6);
-                return $this->loginView->logOutHTML();
+        if(strlen($this->loginModel->getSessionUniqueKey()) > 0 && ($action !== "logout")) {    // Om den unika nyckeln i sessionen och URL:ens querystring inte innehåller "logout"
+            if($this->loginModel->isSessionUniqueKeyValid() == true) {                          // Kollar om det kalkylerade värdet för den unika nyckeln och nyckeln i den faktiska sessionen är likadana
+                $this->loginModel->setLoginMessage(6);                                          // Sätter vilket meddelande som ska visas för användaren
+                return $this->loginView->logOutHTML();                                          // Användaren har lyckats logga in och nu visas vyn för att kunna logga ut
             } else {
-            return $this->loginView->loginHTML();
+            return $this->loginView->loginHTML();                                               // Nyckeln i sessionen och det beräknade värdet stämmer inte, så användaren får försöka igen
             }
         }
 
-        if(($this->loginView->getCookies() == true) && ($action !== "logout")) {
-            $isUserValid = $this->loginModel->authenticateUser($this->loginView->getUserFromCookie(), $this->loginView->getPasswordFromCookie());
+        if(($this->loginView->getCookies() == true) && ($action !== "logout")) {                // Om det finns kakor och det inte står "logout" i querystringen
+            $isUserValid = $this->loginModel->authenticateUser($this->loginView->getUserFromCookie(),   // Kollar om användaruppgifterna stämmer
+                                                               $this->loginView->getPasswordFromCookie(),
+                                                               $this->loginView->getClientBrowser());
             if($isUserValid == true) {
-                $this->loginModel->setLoginMessage(6);
-                return $this->loginView->logOutHTML();
+                if($this->loginView->isSessionId() == true) { // Kolla om det finns någon sessionscookie, finns inte det, så ska inloggning via cookies skrivas ut
+                    $this->loginModel->setLoginMessage(6);    // Sätter meddelandet till en tom sträng
+                } else {
+                    $this->loginModel->setLoginMessage(7);    // Ser till så att meddelandet "Inloggad via cookies" skrivs ut
+                }
+                return $this->loginView->logOutHTML();        // Användaren skickas till vyn för de inloggade, dvs det är möjligt att logga ut
             } else {
-            return $this->loginView->loginHTML();
+                $this->loginModel->setLoginMessage(8);        // Användaren hade kakor med ogiltiga värden i. Meddelandet "Felaktig information i cookie" visas.
+            return $this->loginView->loginHTML();             // Användaren skickas till login-vyn
             }
         }
 
-        if(empty($action)) {
-            return $this->loginView->loginHTML();
-        } elseif($action === "login") {
-           // anropa model med anvnamn o lösenord
-            $isUserValid = $this->loginModel->authenticateUser($this->loginView->getPostedUser(), $this->loginView->getPostedPassword());
-            // var_dump($_POST);
-
-            //echo("Logga in");
-            if($isUserValid == true) {
-                $this->loginModel->setSaveLogin($this->loginView->CheckboxSaveLogin());
-                //var_dump($this->loginView->CheckboxSaveLogin());
-                $this->loginView->setSessionVariables();
-                return $this->loginView->logOutHTML();
+        if(empty($action)) {                                  // Om querystringen är tom...
+            return $this->loginView->loginHTML();             // Skicka användaren till login-vyn
+        } elseif($action === "login") {                       // Om querystringen innehåller strängen "login"
+            $hashedPassword = $this->loginModel->setPasswordHash($this->loginView->getPostedPassword());    // Hasha det inmatade lösenordet
+            $isUserValid = $this->loginModel->authenticateUser($this->loginView->getPostedUser(),           // Autentisera användaren
+                                                               $hashedPassword,
+                                                               $this->loginView->getClientBrowser());
+            if($isUserValid == true) {                                                                      // Användaren är autentiserad
+                $this->loginModel->setSaveLogin($this->loginView->CheckboxSaveLogin());                     // Ska cookies för användaren sättas?
+                return $this->loginView->logOutHTML();                                                      // Användaren skickas till vyn för inloggade, dvs det är möjligt att logga ut
             } else {
-                return $this->loginView->loginHTML();
+                return $this->loginView->loginHTML();                                                       // Användaren försökte logga in med felaktiga uppgifter och skickas till login-vyn
             }
 
-        } elseif($action === "logout") {
-
-            // töm eventuella kakor i model osv
-            // anropa tom inloggning från vyn med texten: Du har nu loggat ut
-            $this->loginModel->logOutUser();
-            //echo("Logga ut");
-            //ta bort ev kakor
-            $this->loginView->deleteSessionVariables();
+        } elseif($action === "logout") {                      // Om strängen "logout" finns i querystringen...
+            $this->loginModel->logOutUser();                  // Ta bort kakor och värden från sessionen
             $this->loginView->deleteCookies();
-            //var_dump($_SESSION);
-            return $this->loginView->loginHTML();
+
+            if($action === "logout" && strlen($this->loginModel->getSessionUniqueKey()) < 1) // Kolla om den unika nyckeln är borttagen i sessionsvariabeln
+                $this->loginModel->setLoginMessage(6);                                       // Då har omladdning av sidan skett och då ska inget meddelande visas
+
+            $this->loginModel->deleteSessionVariables();
+            return $this->loginView->loginHTML();             // Skicka användaren till login-vyn
         } else {
-            return $this->loginView->loginHTML();
+            return $this->loginView->loginHTML();             // I alla andra fall, så skickas användaren till login-vyn
         }
     }
 }

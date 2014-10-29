@@ -13,7 +13,7 @@ require_once("LoginController.php");
 
 $viewLoginController = new LoginController();
 $htmlBody = $viewLoginController->doLogin();
-//ev funktionsanrop
+
 $view = new HTMLView();
 
 $view->echoHTML($htmlBody);
