@@ -8,10 +8,10 @@
 
 class LoginDAL {
 
-    private $host = "localhost"; //"localhost" or "http://mysql.host.com"
-    private $user = "root"; //an authorized user of the MySQL database
-    private $password = "Nisse123"; //my_username's password
-    private $database = "php_db"; //the database we want to use.
+    private $host = "xxx"; //"localhost" or "http://mysql.host.com"
+    private $user = "xxx"; //an authorized user of the MySQL database
+    private $password = "xxx"; //my_username's password
+    private $database = "xxx"; //the database we want to use.
 
     private $dbConnection;
 
