@@ -1,0 +1,104 @@
+{% extends "base.twig" %}
+{% block content %}
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                Träningspass
+                <small>Anteckningar</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> Startsida</a></li>
+                <li><a href="#">Anteckningar</a></li>
+                <li class="active">Träningspass</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+        <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+            <!-- form start -->
+        {% set e = exercises|first %}
+        {% if e %}
+
+            <form role="form" action="?page=start&action=update&passid={{ e['traningspassid'] }}" method="post">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Träningspassanteckningar</h3>
+                    </div><!-- /.box-header -->
+
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>Datum och tid:</label>
+                            <input type="text" class="form-control" placeholder="{{ e['traningspassdatum'] }}" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label>Plats:</label>
+                            <input type="text" class="form-control" placeholder="{{ e['traningspassplats'] }}" disabled/>
+                        </div>
+                        <!-- textarea -->
+                        <div class="form-group">
+                            <label>Anteckningar:</label>
+                            <textarea class="form-control" rows="3" name="sessionnotes" placeholder="">{{ e['anteckningar'] }}</textarea>
+                        </div>
+
+            {% endif %}
+
+
+
+                    </div><!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Spara</button>
+                    </div>
+
+                </div><!-- /.box -->
+
+                {% for e in exercises %}
+                <div class="box box-success">
+                    <div class="box-header">
+                        <h3 class="box-title">{{ e['momentnamn'] }}</h3>
+                    </div><!-- /.box-header -->
+
+                    <div class="box-body">
+                        <!-- textarea -->
+                        <div class="form-group">
+                            <label>Momentspecifika anteckningar:</label>
+                            <textarea class="form-control" rows="3" name="exercise[{{ e['passdetaljerid'] }}][]" placeholder="">{{ e['kommentarer'] }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <label>Antal repetitioner</label>
+                            </div>
+                            <div class="col-xs-2">
+                                <label>Totalt:</label>
+                                <input type="text" class="form-control" name="exercise[{{ e['passdetaljerid'] }}][]" placeholder="{{ e['repetitioner'] }}">
+                            </div>
+                            <div class="col-xs-2">
+                                <label>Lyckade:</label>
+                                <input type="text" class="form-control" name="exercise[{{ e['passdetaljerid'] }}][]" placeholder="{{ e['lyckaderepetitioner'] }}">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div><!-- /.box -->
+                {% endfor %}
+
+            </form>
+        </div><!--/.col (right) -->
+        </div>   <!-- /.row -->
+
+
+
+        </section><!-- /.content -->
+
+
+
+    </aside><!-- /.right-side -->
+
+{% endblock %}
