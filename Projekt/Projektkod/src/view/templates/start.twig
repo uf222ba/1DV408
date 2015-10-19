@@ -41,8 +41,8 @@
                                      <tr>
                                         <td>{{ p['traningspassdatum'] }}</td>
                                         <td>{{ p['traningspassplats'] }}</td>
-                                        <td><a href="?page=sessionnotes&action=update&passid={{ p['traningspassid'] }}">Uppdatera</a></td>
-                                        <td><a href="?page=start&action=delete&passid={{ p['traningspassid'] }}">Ta bort</a></td>
+                                        <td><a href="?action=updateSessionNotes&id={{ p['traningspassid'] }}">Uppdatera</a></td>
+                                        <td><a href="?action=deleteSession&id={{ p['traningspassid'] }}">Ta bort</a></td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

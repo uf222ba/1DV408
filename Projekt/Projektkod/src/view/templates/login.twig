@@ -47,6 +47,20 @@
         <div class="row">
         <!-- left column -->
         <div class="col-md-6">
+
+            {% if message %}
+            <!-- Felaktig inloggning -->
+            <div class="box box-solid box-danger">
+                <div class="box-header">
+                    <h3 class="box-title">Meddelande</h3>
+
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                <p> {{ message }} </p>
+                </div>
+            </div><!-- /.box -->
+            {% endif %}
+
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header">
@@ -57,7 +71,11 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="text">Användarnamn</label>
-                            <input type="text" class="form-control" id="text" name="username" placeholder="Skriv in användarnamn">
+                            {% if username is null %}
+                                <input type="text" class="form-control" id="text" name="username" placeholder="Skriv in användarnamn">
+                            {% else %}
+                                <input type="text" class="form-control" id="text" name="username" value={{ username }}>
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Lösenord</label>

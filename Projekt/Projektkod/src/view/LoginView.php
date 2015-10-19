@@ -2,37 +2,53 @@
 /**
  * Student:     uf222ba
  * Name:        Ulrika Falk
- * Date:        2014-11-16
- * Laboration:  Projekt
+ * Laboration:  Dogbook
+ * Date:        2015-10-10
  */
 
 namespace view;
 
-//require_once("../model/LoginModel.php");
-
+/**
+ * Class LoginView
+ * Class for rendering the login view in the browser and to get and set information using input and output with the view
+ * @package view
+ */
 class LoginView {
     private $loginModel;
     private $clientBrowser;
+    private $ipAddress;
 
+    /**
+     * Constructor with dependency injection
+     */
     public function __construct(\model\LoginModel $loginModel) {
         $this->loginModel = $loginModel;
     }
-    // Kod för login-vyn
+
+    /**
+     * Function for rendering the login view
+     */
     public function loginHTML() {
         $loader = new \Twig_Loader_Filesystem('./src/view/templates');
         $twig = new \Twig_Environment($loader, array('cache' => './tmp/cache',));
-        $arr = array();
+        $arr = array('message' => self::loginMessage($this->loginModel->getLoginDetails()->getLoginMessage()),
+                     'username' => $this->loginModel->getUser()->getUsername());
         echo $twig->render('login.twig', $arr);
     }
 
+    /**
+     * Function for setting the user cookies in the browser
+     */
     public function setCookiesInBrowser() {
-        if(($this->loginModel->getIsUserAuthenticated() == true) && ($this->loginModel->getSaveLogin() == true));
+        if(($this->loginModel->getLoginDetails()->getIsUserAuthenticated() == true) && ($this->loginModel->getLoginDetails()->getSaveLogin() == true));
             $this->setCookies();
     }
 
-    // Kod för den vy som visas när man loggat in
+    /**
+     * Function for rendering the logout view in the browser
+     */
     public function logOutHTML(){
-        if(($this->loginModel->getIsUserAuthenticated() == true) && ($this->loginModel->getSaveLogin() == true)) {  // Kolla så att användaren är autentiserad och om användaren ville spara användaruppgifterna
+        if(($this->loginModel->getLoginDetails()->getIsUserAuthenticated() == true) && ($this->loginModel->getLoginDetails()->getSaveLogin() == true)) {  // Kolla så att användaren är autentiserad och om användaren ville spara användaruppgifterna
             $this->setCookies();                                                                                    // så skapas cookies
         }
 
@@ -42,27 +58,34 @@ class LoginView {
         echo $twig->render('login.twig', $arr);
     }
 
-    // Funktion för alla olika meddelanden
-    // Parameter är ett heltal
-    // Returnerar en sträng beroende på vilken parameter som givits vid anrop av funktionen
-    public function loginMessage($type) {
+    /**
+     * Function for all the different types of login messages
+     * @param $type integer value
+     * @return string containing a message
+     */
+    private static function loginMessage($type) {
         $loginMsg = array();
 
-        $loginMsg[0] = "<p>Användarnamn saknas</p>";
-        $loginMsg[1] = "<p>Lösenord saknas</p>";
-        $loginMsg[2] = "<p>Felaktigt användarnamn och/eller lösenord</p>";
-        $loginMsg[3] = "<p>Du har loggat ut</p>";
-        $loginMsg[4] = "<p>Inloggning lyckades</p>";
-        $loginMsg[5] = "<p>Inloggning lyckades och vi kommer ihåg dig nästa gång</p>";
+        $loginMsg[0] = "Användarnamn saknas";
+        $loginMsg[1] = "Lösenord saknas";
+        $loginMsg[2] = "Felaktigt användarnamn och/eller lösenord";
+        $loginMsg[3] = "Du har loggat ut";
+        $loginMsg[4] = "Inloggning lyckades";
+        $loginMsg[5] = "Inloggning lyckades och vi kommer ihåg dig nästa gång";
         $loginMsg[6] = "";
-        $loginMsg[7] = "<p>Inloggning lyckades via cookies</p>";
-        $loginMsg[8] = "<p>Felaktig information i cookie</p>";
+        $loginMsg[7] = "Inloggning lyckades via cookies";
+        $loginMsg[8] = "Felaktig information i cookie";
+
+        if (!isset($type))
+            $type = 6;
 
         return $loginMsg[$type];
     }
 
-    // Funktion som kollar om querystringen innehåller login, logout eller saknar värde
-    // Returnerar en sträng
+    /**
+     * Function that gets information from the querystring
+     * @return string
+     */
     public function getAction() {
         if(key($_GET) == "login")
             $action = "login";
@@ -73,18 +96,27 @@ class LoginView {
         }
         return $action;
     }
-    // Funktion för att hämta det postade värdet för användarnamnet
-    // Returnerar användarnamnet
+
+    /**
+     * Function for getting the posted username in the login form
+     * @return string username
+     */
     public function getPostedUser() {
-        return $_POST["username"];
+        return trim($_POST["username"]);
     }
-    // Funktion för att hämta det postade värdet för lösenordet
-    // Returnerar användarnamnet
+
+    /**
+     * Function for getting the posted password in the login form
+     * @return string password
+     */
     public function getPostedPassword() {
-        return $_POST["password"];
+        return trim($_POST["password"]);
     }
-    // Funktion för att kolla om användaren klickat i att inloggningen ska sparas i cookies
-    // Returnerar true eller false
+
+    /**
+     * Function for getting the checkbox value from the login form
+     * @return bool true if the login should be saved
+     */
     public function CheckboxSaveLogin() {
         if(isset($_POST["LoginView::Checked"])) {
             //echo "Ikryssad";
@@ -94,20 +126,29 @@ class LoginView {
             return false;
         }
     }
-    // Funktion för att generera en sträng som innehåller tid- och datuminformation
-    // Returnerar en sträng
+
+    /**
+     * Function for generating a string contining time and date information
+     * @return string
+     */
     public function today() {
         setlocale(LC_ALL, "sv_SE", "sv_SE.utf-8", "sv", "swedish"); //http://www.webforum.nu/showthread.php?t=182908
         $todayString = ucwords(utf8_encode(strftime("%A"))) . " den " . date("j") . " ".  strftime("%B") . " &aring;r " . strftime("%Y") . ". Klockan &auml;r [" . date("H:i:s") . "].";
         return $todayString;
     }
-    // Funktion som hämtar värdena från modellen och sätter cookies i webbläsaren
+
+    /**
+     *  Function for getting values form the loginModel instance and setting the cookies in the browser
+     */
     public function setCookies() {
-        setcookie("LoginView::UserName", $this->loginModel->getUserName(), time() + 120);
-        setcookie("LoginView::Password",  $this->loginModel->getPassword(), time() + 120);
+        setcookie("LoginView::UserName", $this->loginModel->getUser()->getUsername(), time() + 120);
+        setcookie("LoginView::Password",  $this->loginModel->getUser()->getPassword(), time() + 120);
     }
-    // Funktion som kollar om cookies är satta
-    // Returnerar true om cookies finns, annars falskt
+
+    /**
+     * Function that checks if the cookies is set
+     * @return bool true if cookies is set, otherwise false
+     */
     public function getCookies() {
         if(isset($_COOKIE["LoginView::UserName"]) && isset($_COOKIE["LoginView::Password"])) {
             return true;
@@ -115,35 +156,59 @@ class LoginView {
             return false;
         }
     }
-    // Funktion för att göra kakorna utgångna, dvs göra dem ogiltiga
+
+    /**
+     * Function for making the cookies invalid
+     */
     public function deleteCookies() {
-        setcookie("LoginView::UserName", $this->loginModel->getUserName(), time() - 3600);
-        setcookie("LoginView::Password",  $this->loginModel->getPassword(), time() - 3600);
+        setcookie("LoginView::UserName", $this->loginModel->getUser()->getUsername(), time() - 3600);
+        setcookie("LoginView::Password",  $this->loginModel->getUser()->getPassword(), time() - 3600);
     }
     // Hämta användarnamnet i kakan
     // Returnerar en sträng
+    /**
+     * @return mixed
+     */
     public function getUserFromCookie(){
         if(isset($_COOKIE["LoginView::UserName"]))
             return $_COOKIE["LoginView::UserName"];
     }
-    // Hämta lösenordet i kakan
-    // Returnerar en sträng
+
+    /**
+     * Get the password from the cookie
+     * @return string
+     */
     public function getPasswordFromCookie(){
         if(isset($_COOKIE["LoginView::Password"]))
             return $_COOKIE["LoginView::Password"];
     }
-    // Funktion för att kolla om webbläsaren fått en kaka med sessionsid:t
-    // Returnerer sant om den har fått det, falskt i annat fall
+
+    /**
+     * Function for checking if the browser has a cookie with the sessionId
+     * @return bool true if sessionId cookie exists, otherwise false
+     */
     public function isSessionId() {
         if(isset($_COOKIE["PHPSESSID"])) {
             return true;
         }
         return false;
     }
-    // Funktion för att hämta vilken webbläsarklient som användaren har
-    // Returnerar en sträng med aktuellt webbläsarnamn
+
+    /**
+     * Function for getting the http user agent
+     * @return string with the name of the web browser
+     */
     public function getClientBrowser() {
         $this->clientBrowser = $_SERVER["HTTP_USER_AGENT"];
         return $this->clientBrowser;
+    }
+
+    /**
+     * Function for getting the IP address of the client
+     * @return string containing the IP address
+     */
+    public function getClientIpAddress() {
+        $this->ipAddress = $_SERVER["REMOTE_ADDR"];
+        return $this->ipAddress;
     }
 }

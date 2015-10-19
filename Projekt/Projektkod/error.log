@@ -1,0 +1,28 @@
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'falkebo_com.hundar' doesn't exist
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'falkebo_com.traningspass' doesn't exist
+2015-10-17 19:45 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '18'' at line 1
+2015-10-17 19:03 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '18'' at line 1
+2015-10-17 19:47 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '18'' at line 1
+2015-10-17 19:09 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '18'' at line 1
+2015-10-17 19:16 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '18'' at line 1
+2015-10-17 20:34 SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '" . self::DB . ".traningspass
+                WHERE traningspassid = '19'' at line 1
+2015-10-17 20:57 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hundar.hundid' doesn't exist
+2015-10-17 20:31 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hundar.default' in 'field list'
+2015-10-17 20:50 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hundar.default' in 'field list'
+2015-10-17 20:55 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hundar.default' in 'field list'
+2015-10-17 20:23 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hundar.default' in 'order clause'
+2015-10-17 20:25 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hundar.default' in 'order clause'
+2015-10-17 20:00 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hundar.hundid' doesn't exist
+2015-10-17 20:53 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'hundar.hundid' doesn't exist
+2015-10-17 20:00 SQLSTATE[HY093]: Invalid parameter number: parameter was not defined
+2015-10-18 09:59 SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+2015-10-18 19:46 SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+2015-10-18 19:46 SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+2015-10-18 20:55 SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+2015-10-18 20:55 SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens

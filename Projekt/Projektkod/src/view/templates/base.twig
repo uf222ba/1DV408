@@ -32,7 +32,7 @@
 
 <!-- header logo: style can be found in header.less -->
 <header class="header">
-    <a href="index.html" class="logo">
+    <a href="index.php" class="logo">
         <!-- Add the class icon to your logo image or logo icon to add the margining -->
         Dogbook
     </a>
@@ -84,11 +84,24 @@
             <!-- Sidebar user panel -->
             <div class="user-panel">
                 <div class="pull-left image">
-                    <img src="vendors/AdminLTE-master/img/ascii_eye.png" class="img-circle" alt="User Image" />
+                    <img src="vendors/AdminLTE-master/img/{{ dogs[0].image }}" class="img-circle" alt="User Image" />
                 </div>
                 <div class="pull-left info">
-                    <p> {{ dogName }}</p>
-
+                    {% if dogs|length > 1 %}
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                {{ dogs[0].name }}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                {% for dog in dogs[1:] %}
+                                <li><a href="?action=changeDog&id={{ dog.id }}">{{ dog.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p> {{ dogs[0].name }}</p>
+                    {% endif %}
                     <a href="#"><i class="fa fa-circle text-success"></i> Aktiv hund</a>
                 </div>
             </div>
@@ -100,7 +113,7 @@
                     </a>
                 </li>
                 <li class="active">
-                    <a href="?page=session&action=new&id=0">
+                    <a href="?action=addSession">
                         <i class="fa fa-edit"></i> <span>Lägg till</span>
                     </a>
                 </li>

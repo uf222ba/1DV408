@@ -2,30 +2,47 @@
 /**
  * Student:     uf222ba
  * Name:        Ulrika Falk
- * Date:        2014-11-16
- * Laboration:  Projekt
+ * Laboration:  Dogbook
+ * Date:        2015-10-10
  */
 
 namespace model;
 
 require_once("DAL.php");
+require_once("src/model/User.php");
+require_once("src/model/LoginDetails.php");
 
+/**
+ * Class LoginDAL inherits the DAL class
+ * Class with functions for handling data exchange with the database
+ * concerning the login part of the application
+ * @package model
+ */
 class LoginDAL extends DAL{
-/*
-    private $host = "localhost"; //"localhost" or "http://mysql.host.com"
-    private $user = "root"; //an authorized user of the MySQL database
-    private $password = "Nisse123"; //my_username's password
-    private $database = "php_db"; //the database we want to use.
-*/
+
     private $dbConnection;
     private $result;
+    private $user;
+    private $login;
 
-    public function __construct() {
+    /**
+     * Constructor
+     * @param User $user
+     * @param LoginDetails $login
+     */
+    public function __construct(User $user, LoginDetails $login) {
         $this->dbConnection = $this->connection();
-        //$this->dbConnection = new \mysqli($this->host, $this->user, $this->password, $this->database);
         $this->result = null;
+        $this->user = $user;
+        $this->login = $login;
     }
-    // Funktion för att se om användaren finns i databasen
+
+    /**
+     * Function for checking if the user is in the database
+     * @param $user
+     * @param $pwd
+     * @return bool returns true if user and password is ok, otherwise false
+     */
     public function getUserCredentialsFromDB($user, $pwd) {
 
         $sql = "SELECT username
@@ -42,7 +59,21 @@ class LoginDAL extends DAL{
         $pdoStmt->setFetchMode(\PDO::FETCH_ASSOC);
         $this->result = $pdoStmt->fetchAll();
 
+
+
         if(count($this->result) == 1){
+            $this->user->setUsername($this->result['0']['username']);
+            $this->user->setPassword($this->result['0']['password']);
+            $this->user->setUserId($this->result['0']['user_id']);
+            $this->user->setFirstName($this->result['0']['firstname']);
+            $this->user->setLastName($this->result['0']['lastname']);
+
+            $this->login->setIsUserAuthenticated(true);
+/*
+            var_dump($this->result);
+            echo("<br /><br />");
+            var_dump($this->user);
+            die(); */
             return true;
         }
         else {
@@ -50,7 +81,13 @@ class LoginDAL extends DAL{
         }
     }
 
-    public function getUserCredentialsWithCookies($user, $pwd, $clientBrowser) {
+    /**
+     * Function for authenticate a user with cookies
+     * @param $user
+     * @param $pwd
+     * @return bool
+     */
+    public function getUserCredentialsWithCookies($user, $pwd) {
         $sql = "SELECT username
                       , password
                       , firstname
@@ -64,13 +101,21 @@ class LoginDAL extends DAL{
         $pdoStmt = $this->dbConnection->prepare($sql);
         $pdoStmt->execute(array(":user" => $user,
                                 ":password" => $pwd,
-                                ":clientbrowser" => $clientBrowser));
+                                ":clientbrowser" => $this->login->getClientBrowser()));
         $pdoStmt->setFetchMode(\PDO::FETCH_ASSOC);
         $this->result = $pdoStmt->fetchAll();
 
         if(count($this->result) == 1){
-            if($this->checkCookie($this->result['0']['cookietimestamp']))
+            if($this->checkCookie($this->result['0']['cookietimestamp'])) {
+                $this->user->setUsername($this->result['0']['username']);
+                $this->user->setPassword($this->result['0']['password']);
+                $this->user->setUserId($this->result['0']['user_id']);
+                $this->user->setFirstName($this->result['0']['firstname']);
+                $this->user->setLastName($this->result['0']['lastname']);
+
+                $this->login->setIsUserAuthenticated(true);
                 return true;
+            }
             else
                 return false;
         }
@@ -79,6 +124,11 @@ class LoginDAL extends DAL{
         }
     }
 
+    /**
+     * Function for checking that the cookie is ok
+     * @param $cookietimestamp
+     * @return bool
+     */
     private function checkCookie($cookietimestamp) {
         $maxtime = 180;
 
@@ -92,7 +142,11 @@ class LoginDAL extends DAL{
         return false;
     }
 
-    // Funktion för att kolla om användaren finns i databasen
+    /**
+     * Function for checking if the user exists in the database
+     * @param $user
+     * @return bool
+     */
     public function isUserInDB($user) {
 
         $stmt = $this->dbConnection->stmt_init();
@@ -112,73 +166,14 @@ class LoginDAL extends DAL{
             return false;
         }
     }
-    // Funktion för att skapa ny användare
-    public function createNewUser($user, $pwd) {
 
-        $stmt = $this->dbConnection->stmt_init();
-        if ($stmt->prepare("INSERT INTO users(username, password)
-                              VALUES (?, ?)")) {
-            $stmt->bind_param("ss", $user, $pwd);
-            $stmt->execute();
-            $result = $stmt->fetch(); // Hämtar resultatet och returnerar en array
-            $stmt->close();
-        }
-
-        if(count($result) == 1){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    public function isUserInDBTest($user) {
-
-        $stmt = $this->dbConnection->stmt_init();
-        if ($stmt->prepare("SELECT username
-                              FROM users
-                              WHERE username = ?")) {
-            $stmt->bind_param("s", $user);
-            $stmt->execute();
-            $result = $stmt->fetch(); // Hämtar resultatet och returnerar en array
-            $stmt->close();
-        }
-
-        if(count($result) == 1){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    public function getResultFromQuery() {
-        return $this->result;
-    }
-
-    public function getDogsFromDB($userId) {
-
-        $sql = "SELECT hundar.hundid
-	                  , hundar.hundnamn
-	                  , hundar.profilbild
-                FROM php_db.hundar
-                WHERE hundar.userid_fk = :userid";
-
-        $pdoStmt = $this->dbConnection->prepare($sql);
-        $pdoStmt->execute(array(":userid" => $userId));
-        $pdoStmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $this->result = $pdoStmt->fetchAll();
-
-        if(count($this->result) > 0){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
+    /**
+     * Function for saving cookie data to database
+     * @param $userId
+     * @param $clientBrowser
+     */
     public function setUserCookies($userId, $clientBrowser) {
-        $sql = 'UPDATE php_db.users
+        $sql = 'UPDATE falkebo_com.users
                 SET cookietimestamp = UNIX_TIMESTAMP(),
                     browser = :clientbrowser
                 WHERE user_id = :userid;';

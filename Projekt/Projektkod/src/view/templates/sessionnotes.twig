@@ -25,7 +25,7 @@
         {% set e = exercises|first %}
         {% if e %}
 
-            <form role="form" action="?page=start&action=update&passid={{ e['traningspassid'] }}" method="post">
+            <form role="form" action="?action=saveSessionNotes&id={{ e['traningspassid'] }}" method="post">
             <!-- general form elements -->
             <div class="box box-primary">
                     <div class="box-header">

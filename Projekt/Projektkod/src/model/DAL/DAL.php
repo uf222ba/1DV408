@@ -2,14 +2,19 @@
 /**
  * Student:     uf222ba
  * Name:        Ulrika Falk
- * Date:        2014-11-16
- * Laboration:  Projekt
+ * Laboration:  Dogbook
+ * Date:        2015-10-10
  */
 
 namespace model;
 
 require_once("./config/LocalSettings.php");
 
+/**
+ * Abstract Class DAL
+ * Abstract base class responsible for the database connection and the database handle
+ * @package model
+ */
 abstract class DAL
 {
     protected $databaseHandle;
